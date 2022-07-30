@@ -2,17 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.WebSockets;
-using System.Text;
-using Newtonsoft.Json;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Networking;
-using TinifyAPI;
-using UnityEngine.Experimental.Rendering;
-using UnityEngine.UI;
-
 
 public class ToTiny : MonoBehaviour
 {
@@ -21,13 +12,15 @@ public class ToTiny : MonoBehaviour
 
     private string _dir = "";
     
-    public void GetTinyPNG(Texture2D texture2D)
+    public void GetTinyPNG(Texture2D texture2D, string dir)
     {
+        Debug.Log(dir);
+        _dir = dir;
+        
         texture = new Texture2D(texture2D.width, texture2D.height, TextureFormat.RGBA32, false);
         texture.SetPixels(texture2D.GetPixels());
         texture.Apply();
-        texture.name = texture2D.name.ToString();
-        Debug.Log(texture.name);
+        texture.name = texture2D.name;
         StartCoroutine(GetRequest("https://api.tinify.com/shrink"));
     }
 
@@ -91,13 +84,12 @@ public class ToTiny : MonoBehaviour
     
     void SaveImage(byte[] data)
     {
-        var dirPath = Application.dataPath + "/Sprite/";
-        if(!Directory.Exists(dirPath)) {
-            Directory.CreateDirectory(dirPath);
+        if(!Directory.Exists(_dir)) {
+            Directory.CreateDirectory(_dir);
         }
 
-        Debug.Log(dirPath);
-        File.WriteAllBytes(dirPath + texture.name, data);
+        Debug.Log(_dir);
+        File.WriteAllBytes(_dir + texture.name, data);
     }
     
     [Serializable]

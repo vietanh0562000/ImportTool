@@ -1,37 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class TextureProcessor : AssetPostprocessor
 {
-    private const string TEXTURE_PATTERN = @"/Texture/";
-    private const string SPRITE_PATTERN = @"/Sprite/";
     private ToTiny _tiny = Object.FindObjectOfType<ToTiny>();
 
     void OnPreprocessTexture()
     {
-        if (assetPath.Contains(SPRITE_PATTERN))
+        ImportToolEditor.FolderAddressList = JsonConvert.DeserializeObject<Dictionary<string, ImageSetting>>(
+            File.ReadAllText(ImportToolEditor._jsonDataFilePath));
+        foreach (var folder in ImportToolEditor.FolderAddressList)
         {
-            // TODO if needed
-            TextureImporter importer = assetImporter as TextureImporter;
+            if (assetPath.Contains(folder.Key))
+            {
+                // TODO if needed
+                TextureImporter importer = assetImporter as TextureImporter;
 
-            importer.textureType = TextureImporterType.Default;
-            importer.npotScale = TextureImporterNPOTScale.None;           // Do not modify texture size.
-            importer.isReadable = true;
-
-            importer.mipmapEnabled = false;
-            importer.anisoLevel    = 0;                                  // RTS game do need anisoLevel
+                importer.textureType = (TextureImporterType) folder.Value.textureType;
+                //importer.textureShape = (TextureImporterShape) folder.Value.textureShape;
+            }   
         }
     }
 
     private void OnPostprocessTexture(Texture2D texture)
     {
-        int lastCross = assetPath.LastIndexOf("/", StringComparison.Ordinal);
-        texture.name = assetPath.Substring(lastCross + 1);
-        var dir = Application.dataPath + assetPath.Substring(0, lastCross + 1);
-        _tiny.GetTinyPNG(texture);
+        foreach (var folder in ImportToolEditor.FolderAddressList)
+        {
+            if (assetPath.Contains(folder.Key))
+            {
+                int lastCross = assetPath.LastIndexOf("/", StringComparison.Ordinal);
+                texture.name = assetPath.Substring(lastCross + 1);
+                var dir = assetPath.Substring(0, lastCross + 1);
+                _tiny.GetTinyPNG(texture, dir);
+            }
+        }
     }
-    
-    
 }
