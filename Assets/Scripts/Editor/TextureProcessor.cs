@@ -14,30 +14,14 @@ public class TextureProcessor : AssetPostprocessor
 
     void OnPreprocessTexture()
     {
-        SetImageSetting(ImportToolEditor.textureType);
+        SetImageSetting();
     }
 
-    public void SetImageSetting(TextureType textureType)
+    public void SetImageSetting()
     {
-        switch (textureType)
-        {
-            case TextureType.Default:
-                SetTypeDefault();
-                break;
-            case TextureType.NormalMap:
-                SetTypeNormalMap();
-                break;
-            case TextureType.Sprite:
-                SetTypeSprite();
-                break;
-        }
-    }
-
-    private void SetTypeDefault()
-    {
-        ImportToolEditor.FolderDefaultAddressList = JsonConvert.DeserializeObject<Dictionary<string, Default>>(
+        ImportToolEditor.FolderAddressList = JsonConvert.DeserializeObject<Dictionary<string, TypeTexture>>(
             File.ReadAllText(ImportToolEditor._jsonDataFilePath));
-        foreach (var folder in ImportToolEditor.FolderDefaultAddressList)
+        foreach (var folder in ImportToolEditor.FolderAddressList)
         {
             if (assetPath.Contains(folder.Key))
             {
@@ -47,65 +31,46 @@ public class TextureProcessor : AssetPostprocessor
                 if (importer != null)
                 {
                     importer.textureType  = folder.Value._textureType;
-                    importer.textureShape = folder.Value._textureShape;
-                    importer.sRGBTexture  = folder.Value._sRGB;
-                    importer.alphaSource  = folder.Value._alphaSource;
-                    importer.wrapMode     = (TextureWrapMode) folder.Value.WrapMode;
-                    importer.filterMode   = folder.Value.FilterMode;
-                    importer.anisoLevel   = folder.Value.AnisoLevel;
-                }
-            }   
-        }
-    }
-    private void SetTypeNormalMap()
-    {
-        ImportToolEditor.FolderNMAddressList = JsonConvert.DeserializeObject<Dictionary<string, NormalMap>>(
-            File.ReadAllText(ImportToolEditor._jsonDataFilePath));
-        foreach (var folder in ImportToolEditor.FolderNMAddressList)
-        {
-            if (assetPath.Contains(folder.Key))
-            {
-                // TODO if needed
-                TextureImporter importer = assetImporter as TextureImporter;
 
-                if (importer != null)
-                {
-                    importer.textureType    = folder.Value._textureType;
-                    importer.textureShape   = folder.Value._textureShape;
-                    importer.ignorePngGamma = folder.Value.ignorePNGFileGamma;
-                    /*importer.grayscaleToAlpha = folder.Value.createfromGrayscale;*/
+                    switch (@importer.textureType)
+                    {
+                        case TextureImporterType.Default:
+                            var type = folder.Value as Default;
+                            
+                            importer.textureShape = type._textureShape;
+                            importer.sRGBTexture  = type._sRGB;
+                            importer.alphaSource  = type._alphaSource;
+                            importer.wrapMode     = (TextureWrapMode) type.WrapMode;
+                            importer.filterMode   = type.FilterMode;
+                            importer.anisoLevel   = type.AnisoLevel;
+                            break;
+                        case TextureImporterType.Sprite:
+                            var type1 = folder.Value as Sprite;
+                            
+                            importer.textureType      = type1._textureType;
+                            importer.textureShape     = type1._textureShape;
+                            importer.spriteImportMode = type1.SpriteImportMode;
+                            importer.wrapMode         = (TextureWrapMode) type1.WrapMode;
+                            importer.filterMode       = type1.FilterMode;
+                            importer.anisoLevel       = type1.AnisoLevel;
+                            break;
+                        case TextureImporterType.NormalMap:
+                            var type2 = folder.Value as NormalMap;
+                            
+                            importer.textureType    = type2._textureType;
+                            importer.textureShape   = type2._textureShape;
+                            importer.ignorePngGamma = type2.ignorePNGFileGamma;
                     
-                    importer.wrapMode     = (TextureWrapMode) folder.Value.WrapMode;
-                    importer.filterMode   = folder.Value.FilterMode;
-                    importer.anisoLevel   = folder.Value.AnisoLevel;
+                            importer.wrapMode   = (TextureWrapMode) type2.WrapMode;
+                            importer.filterMode = type2.FilterMode;
+                            importer.anisoLevel = type2.AnisoLevel;
+                            break;
+                    }
                 }
             }   
         }
     }
-    private void SetTypeSprite()
-    {
-        ImportToolEditor.FolderSpriteAddressList = JsonConvert.DeserializeObject<Dictionary<string, Sprite>>(
-            File.ReadAllText(ImportToolEditor._jsonDataFilePath));
-        foreach (var folder in ImportToolEditor.FolderSpriteAddressList)
-        {
-            if (assetPath.Contains(folder.Key))
-            {
-                // TODO if needed
-                TextureImporter importer = assetImporter as TextureImporter;
 
-                if (importer != null)
-                {
-                    importer.textureType  = folder.Value._textureType;
-                    importer.textureShape = folder.Value._textureShape;
-                    importer.spriteImportMode  = folder.Value.SpriteImportMode;
-                    importer.wrapMode     = (TextureWrapMode) folder.Value.WrapMode;
-                    importer.filterMode   = folder.Value.FilterMode;
-                    importer.anisoLevel   = folder.Value.AnisoLevel;
-                }
-            }   
-        }
-    }
-    
     private void OnPostprocessTexture(Texture2D texture)
     {
         foreach (var folder in ImportToolEditor.FolderAddressList)

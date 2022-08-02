@@ -23,7 +23,7 @@ public enum TextureType
 
 public class ImportToolEditor : OdinEditorWindow
 {
-    public static Dictionary<string, TextureType> FolderAddressList        = new Dictionary<string, TextureType>();
+    public static Dictionary<string, TypeTexture> FolderAddressList        = new Dictionary<string, TypeTexture>();
     public static Dictionary<string, Sprite>      FolderSpriteAddressList  = new Dictionary<string, Sprite>();
     public static Dictionary<string, Default>     FolderDefaultAddressList = new Dictionary<string, Default>();
     public static Dictionary<string, NormalMap>   FolderNMAddressList      = new Dictionary<string, NormalMap>();
@@ -47,24 +47,26 @@ public class ImportToolEditor : OdinEditorWindow
         _pathFolder = _pathFolder.Substring(assetsAddressIndex + 1);
     }
 
-    [Space] public static TextureType textureType;
-    [Space] public TextureType _textureType;
-    [Space] 
-    [ShowIf("_textureType", TextureType.Default)]public Default     Default = new Default();
-    [ShowIf("_textureType", TextureType.Sprite)] public Sprite    Sprite = new Sprite();
-    [ShowIf("_textureType", TextureType.NormalMap)] public NormalMap NormalMap = new NormalMap();
+    [Space] public        TextureType _textureType;
+
+    [Space] [ShowIf("_textureType", TextureType.Default)]
+    public Default Default = new Default();
+
+    [ShowIf("_textureType", TextureType.Sprite)]
+    public Sprite Sprite = new Sprite();
+
+    [ShowIf("_textureType", TextureType.NormalMap)]
+    public NormalMap NormalMap = new NormalMap();
 
     [Button]
     void CookAsset()
     {
         //TODO: VA----- Rewrite setting for selected folder
-        SetImageSetting(textureType);
+        SetImageSetting(_textureType);
     }
 
     public void SetImageSetting(TextureType textureType)
     {
-        textureType = _textureType;
-        
         switch (textureType)
         {
             case TextureType.Default:
@@ -77,45 +79,41 @@ public class ImportToolEditor : OdinEditorWindow
                 SetTypeSprite();
                 break;
         }
+        
+        File.WriteAllText(_jsonDataFilePath, JsonConvert.SerializeObject(FolderAddressList));
     }
 
     private void SetTypeDefault()
     {
-        if (!FolderDefaultAddressList.ContainsKey(_pathFolder))
+        if (!FolderAddressList.ContainsKey(_pathFolder))
         {
-            FolderDefaultAddressList.Add(_pathFolder, Default);
+            FolderAddressList.Add(_pathFolder, Default);
         }
         else
         {
-            FolderDefaultAddressList[_pathFolder] = Default;
+            FolderAddressList[_pathFolder] = Default;
         }
-
-        File.WriteAllText(_jsonDataFilePath, JsonConvert.SerializeObject(FolderDefaultAddressList));
     }
     private void SetTypeNormalMap()
     {
-        if (!FolderNMAddressList.ContainsKey(_pathFolder))
+        if (!FolderAddressList.ContainsKey(_pathFolder))
         {
-            FolderNMAddressList.Add(_pathFolder, NormalMap);
+            FolderAddressList.Add(_pathFolder, NormalMap);
         }
         else
         {
-            FolderNMAddressList[_pathFolder] = NormalMap;
+            FolderAddressList[_pathFolder] = NormalMap;
         }
-
-        File.WriteAllText(_jsonDataFilePath, JsonConvert.SerializeObject(FolderNMAddressList));
     }
     private void SetTypeSprite()
     {
-        if (!FolderSpriteAddressList.ContainsKey(_pathFolder))
+        if (!FolderAddressList.ContainsKey(_pathFolder))
         {
-            FolderSpriteAddressList.Add(_pathFolder, Sprite);
+            FolderAddressList.Add(_pathFolder, Sprite);
         }
         else
         {
-            FolderSpriteAddressList[_pathFolder] = Sprite;
+            FolderAddressList[_pathFolder] = Sprite;
         }
-
-        File.WriteAllText(_jsonDataFilePath, JsonConvert.SerializeObject(FolderSpriteAddressList));
     }
 }

@@ -4,9 +4,9 @@
     using UnityEditor;
     using UnityEngine;
 
-    public class Default 
+    public class Default : TypeTexture
     {
-        [HideInEditorMode] public TextureImporterType        _textureType  = TextureImporterType.Default;
+        public Default() { _textureType = TextureImporterType.Default; }
         public                    TextureImporterShape       _textureShape = TextureImporterShape.Texture2D;
         [Space] public            bool                       _sRGB         = false;
         public                    TextureImporterAlphaSource _alphaSource;

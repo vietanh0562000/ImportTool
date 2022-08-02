@@ -4,9 +4,10 @@
     using UnityEditor;
     using UnityEngine;
 
-    public class NormalMap 
+    public class NormalMap : TypeTexture
     {
-        [HideInEditorMode] public TextureImporterType  _textureType  = TextureImporterType.NormalMap;
+        public NormalMap() { _textureType = TextureImporterType.NormalMap; }
+
         public                    TextureImporterShape _textureShape = TextureImporterShape.Texture2D;
 
         [Space] public bool ignorePNGFileGamma;

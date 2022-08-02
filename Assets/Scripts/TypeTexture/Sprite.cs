@@ -4,9 +4,9 @@
     using UnityEditor;
     using UnityEngine;
 
-    public class Sprite 
+    public class Sprite : TypeTexture
     {
-        [HideInEditorMode]    public TextureImporterType  _textureType     = TextureImporterType.Sprite;
+        public Sprite() { _textureType = TextureImporterType.Sprite; }
         [DisableInEditorMode] public TextureImporterShape _textureShape    = TextureImporterShape.Texture2D;
         [Space]               public SpriteImportMode     SpriteImportMode = SpriteImportMode.Single;
         [Space]               public WrapMode             WrapMode;
